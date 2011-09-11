@@ -44,41 +44,41 @@ the usual title and body.</p>
 // {{{ _dml_keyword_search_do_search()
 
 function _dml_keyword_search_do_search($atts, $count_only) {
-    global $q;
+	global $q;
 
-    extract(lAtts(array(
-        'limit' => 500
-    ) ,$atts));
+	extract(lAtts(array(
+		'limit' => 500
+	) ,$atts));
 
-    if ($q != '') {
-        // prevent searches in sections where search is disabled
-        $s_filter = '';
-        $rs = safe_column('name', 'txp_section', "searchable != '1'");
-        if ($rs) {
-            foreach ($rs as $name) {
-                $filters[] = "and Section != '$name'";
-            }
-            $s_filter = join(' ', $filters);
-        }
+	if ($q != '') {
+		// prevent searches in sections where search is disabled
+		$s_filter = '';
+		$rs = safe_column('name', 'txp_section', "searchable != '1'");
+		if ($rs) {
+			foreach ($rs as $name) {
+				$filters[] = "and Section != '$name'";
+			}
+			$s_filter = join(' ', $filters);
+		}
 
-        // construct query
-        $select = '*, unix_timestamp(Posted) as uPosted,'
-            . " match (Title,Body,Keywords) against ('$q') as score";
+		// construct query
+		$select = '*, unix_timestamp(Posted) as uPosted,'
+			. " match (Title,Body,Keywords) against ('$q') as score";
 
-        $where = "(Title rlike '$q' or Body rlike '$q' or Keywords rlike '$q')"
-            . " $s_filter and Status = 4 and Posted <= now()"
-            . " order by score desc limit $limit";
+		$where = "(Title rlike '$q' or Body rlike '$q' or Keywords rlike '$q')"
+			. " $s_filter and Status = 4 and Posted <= now()"
+			. " order by score desc limit $limit";
 
-        $rs = safe_rows($select, 'textpattern', $where);
+		$rs = safe_rows($select, 'textpattern', $where);
 
-        if ($count_only) {
-            return count($rs);
-        } else {
-            return $rs;
-        }
-    }
+		if ($count_only) {
+			return count($rs);
+		} else {
+			return $rs;
+		}
+	}
 
-    return '';
+	return '';
 }
 
 // }}}
@@ -86,21 +86,21 @@ function _dml_keyword_search_do_search($atts, $count_only) {
 // {{{ dml_keyword_search()
 
 function dml_keyword_search($atts) {
-    $rs = _dml_keyword_search_do_search($atts);
+	$rs = _dml_keyword_search_do_search($atts);
 
-    if ($rs) {
-        $articles = array();
+	if ($rs) {
+		$articles = array();
 
-        foreach ($rs as $a) {
-            populateArticleData($a);
-            $form = gAtt($atts, 'searchform', 'search_results');
-            $article = fetch_form($form);
-            $articles[] = parse($article);
-        }
-            
-        return join ('',$articles);
-    }
-    return '';
+		foreach ($rs as $a) {
+			populateArticleData($a);
+			$form = gAtt($atts, 'searchform', 'search_results');
+			$article = fetch_form($form);
+			$articles[] = parse($article);
+		}
+
+		return join ('',$articles);
+	}
+	return '';
 }
 
 // }}}
@@ -108,23 +108,23 @@ function dml_keyword_search($atts) {
 // {{{ dml_keyword_search_count()
 
 function dml_keyword_search_count($atts) {
-    extract(lAtts(array(
-        text => 'Found %s matches',
-        single => 'Found %s match',
-        zero => 'Sorry, there were no matches for your query'
-    ) ,$atts));
+	extract(lAtts(array(
+		text => 'Found %s matches',
+		single => 'Found %s match',
+		zero => 'Sorry, there were no matches for your query'
+	) ,$atts));
 
-    $count = _dml_keyword_search_do_search($atts, 'count_only');
+	$count = _dml_keyword_search_do_search($atts, 'count_only');
 
-    if ($count == 1) {
-        $ret = $single;
-    } elseif ($count === 0) {
-        $ret = $zero;
-    } else {
-        $ret = $text;
-    }
+	if ($count == 1) {
+		$ret = $single;
+	} elseif ($count === 0) {
+		$ret = $zero;
+	} else {
+		$ret = $text;
+	}
 
-    return str_replace('%s', $count, $ret);
+	return str_replace('%s', $count, $ret);
 }
 
 // }}}
