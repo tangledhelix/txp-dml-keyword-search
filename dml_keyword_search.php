@@ -7,9 +7,9 @@
 // file name. Uncomment and edit this line to override:
 # $plugin['name'] = 'abc_plugin';
 
-$plugin 'version'] = '0.1';
-$plugin['author'] = 'Dan Lowe';
-$plugin['author_uri'] = 'http://tangledhelix.com/';
+$plugin 'version']     = '0.1';
+$plugin['author']      = 'Dan Lowe';
+$plugin['author_uri']  = 'http://tangledhelix.com/';
 $plugin['description'] = 'Extend the search function to allow keyword searching';
 
 // Plugin types:
